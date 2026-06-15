@@ -12,7 +12,7 @@ re-asserted each run while the condition persists. Any hold whose setpoints
 don't exactly equal OFF_PAIR, MAX_PAIR_COOL, or MAX_PAIR_HEAT is a human
 hold and is never touched.
 
-Public-repo rule: never print tokens or raw API response bodies — GitHub
+Public-repo rule: never print tokens or raw API bodies — GitHub
 Actions logs here are public. Secrets come from env vars only.
 """
 import datetime

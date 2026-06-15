@@ -98,6 +98,19 @@ Settings → Actions → "Require approval for all outside collaborators".
    `HW_LOCATION_ID`, `NTFY_TOPIC` (optional).
 6. **Tune the constants** at the top of `guard.py` and push.
 
+## Testing locally
+
+```bash
+pip install -r requirements.txt
+
+# Run the decision logic tests (no credentials needed)
+python test_decide.py
+
+# Dry run — reads live price and thermostat, logs decision, never writes
+HW_API_KEY=... HW_API_SECRET=... HW_REFRESH_TOKEN=... \
+HW_DEVICE_ID=... HW_LOCATION_ID=... DRY_RUN=true python guard.py
+```
+
 ## Things to know
 
 - **The house drifts during spikes.** OFF means "hold at your hard limits",

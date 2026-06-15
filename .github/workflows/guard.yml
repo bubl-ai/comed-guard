@@ -1,0 +1,48 @@
+name: ComEd Price Guard
+
+on:
+  schedule:
+    # Every 10 minutes. GitHub may delay scheduled runs at busy times;
+    # acceptable because ComEd bills on the hourly average.
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (log the decision, don't touch the thermostat)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: price-guard
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: python test_decide.py
+
+      - name: Run price guard
+        run: python guard.py
+        env:
+          HW_API_KEY: ${{ secrets.HW_API_KEY }}
+          HW_API_SECRET: ${{ secrets.HW_API_SECRET }}
+          HW_REFRESH_TOKEN: ${{ secrets.HW_REFRESH_TOKEN }}
+          HW_DEVICE_ID: ${{ secrets.HW_DEVICE_ID }}
+          HW_LOCATION_ID: ${{ secrets.HW_LOCATION_ID }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          DRY_RUN: ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && 'true' || 'false' }}
